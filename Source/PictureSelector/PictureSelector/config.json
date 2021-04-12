@@ -1,0 +1,9 @@
+﻿{
+  "AllowedPictureFormats": [
+    "jpg"
+  ],
+  "ComputerVisionServiceEndpoint": "https://xxx.cognitiveservices.azure.com/",
+  "ComputerVisionServiceKey": "xxx",
+  "TextAnalyticsServiceEndpoint": "https://xxx.cognitiveservices.azure.com/",
+  "TextAnalyticsServiceKey": "xxx"
+}
