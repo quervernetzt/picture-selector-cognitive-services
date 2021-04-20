@@ -33,7 +33,7 @@ namespace PictureSelector
             List<string> picturePaths = FileOperations.GetFilePaths(picturesFullPath, Config.AllowedPictureFormats);
             Console.WriteLine($"Working with { picturePaths.Count } pictures in '{ picturesFullPath }'...\n");
 
-            string resultPath = "";
+            List<ImageDescriptionExtended> resultingImages = new List<ImageDescriptionExtended>();
 
             Console.WriteLine("Do you want to select the picture randomly or using Cognitive Services? Please enter 'random' or 'cognitive'...");
             string selectType = Console.ReadLine().ToLower();
@@ -41,28 +41,24 @@ namespace PictureSelector
             if (selectType == "random")
             {
                 // Random Selection
-                Console.WriteLine("You selected the random selection...\n");
-                RandomSelect randomSelect = new RandomSelect();
-                List<string> randomSelectResults = randomSelect.GetTopRandomFiles(picturePaths, 1);
-                resultPath = randomSelectResults.First();
+                Console.WriteLine("You selected the random  selection. How many pictures shall be selected? (please insert a valid integer)\n");
+                int numberOfPictures = Int32.Parse(Console.ReadLine());
+                Console.WriteLine($"You entered '{ numberOfPictures }'...\n");
 
-                Console.WriteLine($"The picture randomly selected is: '{ resultPath }'...\n");
+                RandomSelect randomSelect = new RandomSelect();
+                resultingImages = randomSelect.GetTopRandomFiles(picturePaths, numberOfPictures);
             }
             else if (selectType == "cognitive")
             {
                 // Cognitive Services Selection based on image description and sentiment analysis
-                Console.WriteLine("You selected the cognitive selection. Depending on the number and size of pictures this may take a while...\n");
-                CognitiveServicesSelect cognitiveServicesSelect = new CognitiveServicesSelect(Config);
-                List<ImageDescriptionWithPathAndSentimentModel> imageDescriptions = await cognitiveServicesSelect.GetImagesDescriptions(picturePaths);
-                ImageDescriptionWithPathAndSentimentModel imageDescriptionsWithPathAndSentimentMostPositive = await cognitiveServicesSelect.GetMostPositiveImagePath(imageDescriptions);
-                resultPath = imageDescriptionsWithPathAndSentimentMostPositive.FilePath;
+                Console.WriteLine("You selected the cognitive selection. How many pictures shall be selected? (please insert a valid integer)\n");
+                int numberOfPictures = Int32.Parse(Console.ReadLine());
+                Console.WriteLine($"You entered '{ numberOfPictures }'. Depending on the number and size of all pictures this may take a while...\n");
 
-                Console.WriteLine($"The picture selected using Cognitive Services has the path '{ imageDescriptionsWithPathAndSentimentMostPositive.FilePath }', " +
-                    $"the description '{  imageDescriptionsWithPathAndSentimentMostPositive.Description.Captions[0].Text }' " +
-                    $"and the following sentiment scores:");
-                Console.WriteLine($"Positive score: {imageDescriptionsWithPathAndSentimentMostPositive.Sentiment.ConfidenceScores.Positive:0.00}");
-                Console.WriteLine($"Negative score: {imageDescriptionsWithPathAndSentimentMostPositive.Sentiment.ConfidenceScores.Negative:0.00}");
-                Console.WriteLine($"Neutral score: {imageDescriptionsWithPathAndSentimentMostPositive.Sentiment.ConfidenceScores.Neutral:0.00}\n");
+                CognitiveServicesSelect cognitiveServicesSelect = new CognitiveServicesSelect(Config);
+                List<ImageDescriptionExtended> imageDescriptions = await cognitiveServicesSelect.GetImagesDescriptions(picturePaths);
+                resultingImages = 
+                    await cognitiveServicesSelect.GetTopMostPositiveImages(imageDescriptions, numberOfPictures);
             }
             else
             {
@@ -70,8 +66,17 @@ namespace PictureSelector
                 return;
             }
 
-            Console.WriteLine("Writing result to Result folder...\n");
-            FileOperations.WriteResultToFolder(resultFullPath, resultPath);
+            if (resultingImages.Count > 0)
+            {
+                Console.WriteLine("Writing results to Result folder...\n");
+
+                List<string> resultPaths = resultingImages.Select(i => i.FilePath).ToList();
+                FileOperations.WriteResultsToFolder(resultFullPath, resultPaths);
+            }
+            else
+            {
+                Console.WriteLine("No pictures to write...");
+            }
 
             Console.WriteLine("Done and Goodbye...");
 

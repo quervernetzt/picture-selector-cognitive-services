@@ -39,15 +39,15 @@ namespace PictureSelector.Selectors
         /// <returns>
         ///     Return the image descriptions.
         /// </returns>
-        public async Task<List<ImageDescriptionWithPathAndSentimentModel>> GetImagesDescriptions(List<string> filePaths)
+        public async Task<List<ImageDescriptionExtended>> GetImagesDescriptions(List<string> filePaths)
         {
-            List<ImageDescriptionWithPathAndSentimentModel> imageDescriptionsWithPath = new List<ImageDescriptionWithPathAndSentimentModel>();
+            List<ImageDescriptionExtended> imageDescriptionsWithPath = new List<ImageDescriptionExtended>();
 
             foreach (string filePath in filePaths)
             {
                 using (Stream fileStream = File.OpenRead(filePath))
                 {
-                    ImageDescriptionWithPathAndSentimentModel imageDescriptionWithPath = new ImageDescriptionWithPathAndSentimentModel();
+                    ImageDescriptionExtended imageDescriptionWithPath = new ImageDescriptionExtended();
 
                     imageDescriptionWithPath.Description = await VisionClient.DescribeImageInStreamAsync(fileStream, maxCandidates: 1, language: "en");
                     imageDescriptionWithPath.FilePath = filePath;
@@ -59,41 +59,32 @@ namespace PictureSelector.Selectors
         }
 
         /// <summary>
-        ///     Extract the image with the most positive sentiment based on its description.
+        ///     Extract the top most positive images based on its description.
         /// </summary>
         /// <param name="imageDescriptionsWithPathAndSentiment">
         ///     The image descriptions including the images paths.
         /// </param>
+        ///     Number of images to select.
         /// <returns>
         ///     Returns the description of the most positive image.
         /// </returns>
-        public async Task<ImageDescriptionWithPathAndSentimentModel> GetMostPositiveImagePath(List<ImageDescriptionWithPathAndSentimentModel> imageDescriptionsWithPathAndSentiment)
+        public async Task<List<ImageDescriptionExtended>> GetTopMostPositiveImages(List<ImageDescriptionExtended> imageDescriptionsWithPathAndSentiment, int numberOfImages)
         {
-            foreach (ImageDescriptionWithPathAndSentimentModel imageDescriptionWithPathAndSentiment in imageDescriptionsWithPathAndSentiment)
+            foreach (ImageDescriptionExtended imageDescriptionWithPathAndSentiment in imageDescriptionsWithPathAndSentiment)
             {
                 string imageDescriptionText = imageDescriptionWithPathAndSentiment.Description.Captions[0].Text;
                 DocumentSentiment sentimentResult = await TextClient.AnalyzeSentimentAsync(imageDescriptionText);
                 imageDescriptionWithPathAndSentiment.Sentiment = sentimentResult;
             }
 
-            List<ImageDescriptionWithPathAndSentimentModel> imageDescriptionsWithPathAndSentimentMostPositive = imageDescriptionsWithPathAndSentiment
-                .Where(i => i.Sentiment.ConfidenceScores.Positive == imageDescriptionsWithPathAndSentiment.Max(p => p.Sentiment.ConfidenceScores.Positive))
+            List<ImageDescriptionExtended> imageDescriptionsWithPathAndSentimentOrdered =
+                imageDescriptionsWithPathAndSentiment
+                .OrderByDescending(i => i.Sentiment.ConfidenceScores.Positive)
+                .ThenByDescending(p => p.Sentiment.ConfidenceScores.Neutral)
+                .Take(numberOfImages)
                 .ToList();
 
-            if (imageDescriptionsWithPathAndSentimentMostPositive.Count > 1)
-            {
-                imageDescriptionsWithPathAndSentimentMostPositive = imageDescriptionsWithPathAndSentimentMostPositive
-                    .Where(i => i.Sentiment.ConfidenceScores.Neutral == imageDescriptionsWithPathAndSentimentMostPositive.Max(p => p.Sentiment.ConfidenceScores.Neutral))
-                    .ToList();
-            }
-
-            if (imageDescriptionsWithPathAndSentimentMostPositive.Count > 1)
-            {
-                Random random = new Random();
-                return imageDescriptionsWithPathAndSentimentMostPositive[random.Next(0, imageDescriptionsWithPathAndSentimentMostPositive.Count())];
-            }
-
-            return imageDescriptionsWithPathAndSentimentMostPositive.FirstOrDefault();
+            return imageDescriptionsWithPathAndSentimentOrdered;
         }
     }
 }

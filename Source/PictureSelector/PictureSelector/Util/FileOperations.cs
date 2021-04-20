@@ -103,18 +103,23 @@ namespace PictureSelector.Util
         /// <param name="fullResultPath">
         ///     The full path to the result folder.
         /// </param>
-        /// <param name="resultPath">
-        ///     The path to the result to be copied.
+        /// <param name="resultPaths">
+        ///     The paths to the results to be copied.
         /// </param>
-        public static void WriteResultToFolder(string fullResultPath, string resultPath)
+        public static void WriteResultsToFolder(string fullResultPath, List<string> resultPaths)
         {
             if (Directory.Exists(fullResultPath))
             {
                 Directory.Delete(fullResultPath, true);
             }
             Directory.CreateDirectory(fullResultPath);
-            string fileName = resultPath.Split(Path.DirectorySeparatorChar).Last();
-            File.Copy(resultPath, $"{ fullResultPath }{ Path.DirectorySeparatorChar }{ fileName }");
+
+            for (int i = 1; i <= resultPaths.Count; i++)
+            {
+                string resultPath = resultPaths[i-1];
+                string fileName = resultPath.Split(Path.DirectorySeparatorChar).Last();
+                File.Copy(resultPath, $"{ fullResultPath }{ Path.DirectorySeparatorChar }{ i }-{ fileName }");
+            }
         }
 
         /// <summary>

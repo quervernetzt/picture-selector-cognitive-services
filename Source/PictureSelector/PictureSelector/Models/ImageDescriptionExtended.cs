@@ -3,7 +3,7 @@ using Microsoft.Azure.CognitiveServices.Vision.ComputerVision.Models;
 
 namespace PictureSelector.Models
 {
-    public class ImageDescriptionWithPathAndSentimentModel
+    public class ImageDescriptionExtended
     {
         public ImageDescription Description { get; set; }
 
