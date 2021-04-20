@@ -2,8 +2,8 @@
   "AllowedPictureFormats": [
     "jpg"
   ],
-  "ComputerVisionServiceEndpoint": "https://xxx.cognitiveservices.azure.com/",
-  "ComputerVisionServiceKey": "xxx",
-  "TextAnalyticsServiceEndpoint": "https://xxx.cognitiveservices.azure.com/",
-  "TextAnalyticsServiceKey": "xxx"
+  "ComputerVisionServiceEndpoint": "https://bewellvision.cognitiveservices.azure.com/",
+  "ComputerVisionServiceKey": "40c6500bdabd49b8960a8405eaae9fc0",
+  "TextAnalyticsServiceEndpoint": "https://bewell.cognitiveservices.azure.com/",
+  "TextAnalyticsServiceKey": "54f2eefdf32a4b0fb512926daf91efbc"
 }

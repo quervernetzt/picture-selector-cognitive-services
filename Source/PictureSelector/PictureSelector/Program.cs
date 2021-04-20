@@ -41,7 +41,7 @@ namespace PictureSelector
             if (selectType == "random")
             {
                 // Random Selection
-                Console.WriteLine("You selected the random  selection. How many pictures shall be selected? (please insert a valid integer)\n");
+                Console.WriteLine("You selected the random  selection. How many pictures shall be selected? (please insert a valid integer)");
                 int numberOfPictures = Int32.Parse(Console.ReadLine());
                 Console.WriteLine($"You entered '{ numberOfPictures }'...\n");
 
@@ -51,7 +51,7 @@ namespace PictureSelector
             else if (selectType == "cognitive")
             {
                 // Cognitive Services Selection based on image description and sentiment analysis
-                Console.WriteLine("You selected the cognitive selection. How many pictures shall be selected? (please insert a valid integer)\n");
+                Console.WriteLine("You selected the cognitive selection. How many pictures shall be selected? (please insert a valid integer)");
                 int numberOfPictures = Int32.Parse(Console.ReadLine());
                 Console.WriteLine($"You entered '{ numberOfPictures }'. Depending on the number and size of all pictures this may take a while...\n");
 
