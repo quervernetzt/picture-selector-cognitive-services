@@ -2,6 +2,7 @@
 {
     public enum SelectorMethods
     {
-        RandomSelect
+        random,
+        cognitive
     }
 }

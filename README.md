@@ -4,9 +4,8 @@
 
 - Ways
     - Random: a picture is randomly selected
-    - Cognitive Services: using image description and sentiment analysis to find out the most positive picture
-        - Logic: Find the picture with the most positive sentiment for its description, if there are multiple,
-            select the one out of them that is most neutral, if there are still multiple, select randomly from the rest
+    - Cognitive Services: using image description and sentiment analysis to find out the top x most positive pictures
+
 
 # How to use it
 

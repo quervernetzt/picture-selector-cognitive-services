@@ -38,7 +38,7 @@ namespace PictureSelector
             Console.WriteLine("Do you want to select the picture randomly or using Cognitive Services? Please enter 'random' or 'cognitive'...");
             string selectType = Console.ReadLine().ToLower();
 
-            if (selectType == "random")
+            if (selectType == SelectorMethods.random.ToString())
             {
                 // Random Selection
                 Console.WriteLine("You selected the random  selection. How many pictures shall be selected? (please insert a valid integer)");
@@ -48,7 +48,7 @@ namespace PictureSelector
                 RandomSelect randomSelect = new RandomSelect();
                 resultingImages = randomSelect.GetTopRandomFiles(picturePaths, numberOfPictures);
             }
-            else if (selectType == "cognitive")
+            else if (selectType == SelectorMethods.cognitive.ToString())
             {
                 // Cognitive Services Selection based on image description and sentiment analysis
                 Console.WriteLine("You selected the cognitive selection. How many pictures shall be selected? (please insert a valid integer)");
@@ -70,8 +70,7 @@ namespace PictureSelector
             {
                 Console.WriteLine("Writing results to Result folder...\n");
 
-                List<string> resultPaths = resultingImages.Select(i => i.FilePath).ToList();
-                FileOperations.WriteResultsToFolder(resultFullPath, resultPaths);
+                FileOperations.WriteResultsToFolder(selectType, resultFullPath, resultingImages);
             }
             else
             {

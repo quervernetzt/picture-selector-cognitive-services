@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PictureSelector.Models;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -103,10 +104,13 @@ namespace PictureSelector.Util
         /// <param name="fullResultPath">
         ///     The full path to the result folder.
         /// </param>
-        /// <param name="resultPaths">
-        ///     The paths to the results to be copied.
+        /// <param name="resultingImages">
+        ///     The resulting images to be written.
         /// </param>
-        public static void WriteResultsToFolder(string fullResultPath, List<string> resultPaths)
+        public static void WriteResultsToFolder(
+            string selectType, 
+            string fullResultPath, 
+            List<ImageDescriptionExtended> resultingImages)
         {
             if (Directory.Exists(fullResultPath))
             {
@@ -114,11 +118,31 @@ namespace PictureSelector.Util
             }
             Directory.CreateDirectory(fullResultPath);
 
-            for (int i = 1; i <= resultPaths.Count; i++)
+            for (int i = 1; i <= resultingImages.Count; i++)
             {
-                string resultPath = resultPaths[i-1];
-                string fileName = resultPath.Split(Path.DirectorySeparatorChar).Last();
-                File.Copy(resultPath, $"{ fullResultPath }{ Path.DirectorySeparatorChar }{ i }-{ fileName }");
+                ImageDescriptionExtended resultingImage = resultingImages[i-1];
+
+                string fileName = resultingImage.FilePath.Split(Path.DirectorySeparatorChar).Last();
+                string fullPath = "";
+
+                if (selectType == SelectorMethods.cognitive.ToString())
+                {
+                    string sentiment = $"{resultingImage.Sentiment.ConfidenceScores.Positive:0.00}-" +
+                        $"{resultingImage.Sentiment.ConfidenceScores.Neutral:0.00}-" +
+                        $"{resultingImage.Sentiment.ConfidenceScores.Negative:0.00}";
+                    fullPath = $"{ fullResultPath }{ Path.DirectorySeparatorChar }{ i }-{ sentiment }-{ fileName }";
+                    
+                }
+                else if (selectType == SelectorMethods.random.ToString())
+                {
+                    fullPath = $"{ fullResultPath }{ Path.DirectorySeparatorChar }{ i }-{ fileName }";
+                }
+                else
+                {
+                    throw new NotSupportedException("Unknown selector method...");
+                }
+
+                File.Copy(resultingImage.FilePath, fullPath);
             }
         }
 
